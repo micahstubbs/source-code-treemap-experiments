@@ -39,20 +39,27 @@ data.forEach(d => {
     d.path.match(/h2o-3\/h2o-test-accuracy\/build/) === null &&
     d.path.match(/h2o-3\/h2o-test-integ\/build/) === null &&
     d.path.match(/h2o-3\/h2o-assembly\/build/) === null &&
-    // ignore build files & folders that are not called build
+    // ignore built files & folders that are not called build
     d.path.match(/h2o-web\/src\/main\/resources/) === null &&
     d.path.match(/h2o-web\/lib/) === null &&
     d.path.match(/h2o-docs\/routes.json/) === null &&
     d.path.match(/h2o-docs\/schemas.json/) === null &&
+    d.path.match(/h2o-core\/src\/main\/resources\/www\/js\/vendor/) === null &&
     // ignore binaries
     d.path.match(/\.jar/) === null &&
     d.path.match(/\.tar\.gz/) === null &&
     d.path.match(/\.whl/) === null &&
     d.path.match(/\.bin/) === null &&
+    d.path.match(/\.pdf/) === null &&
+    // ignore images (which are also binary files)
+    d.path.match(/\.png/) === null &&
+    d.path.match(/\.gif/) === null && 
     // ignore other large files & folders for now
     d.path.match(/h2o-3\/h2o-py\/h2o\/backend\/bin/) === null &&
     d.path.match(/h2o-3\/h2o-py\/dist/) === null &&
-    d.path.match(/h2o-3\/h2o-r\/h2o-package\/inst\/java/) === null
+    d.path.match(/h2o-3\/h2o-r\/h2o-package\/inst\/java/) === null &&
+    d.path.match(/\.ipynb/) === null &&
+    d.path.match(/\/h2o-docs/) === null
   ) {
     outputData.push(d);
   }
