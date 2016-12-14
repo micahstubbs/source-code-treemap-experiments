@@ -1,0 +1,25 @@
+{
+  "name": "source-code-treemap-experiments",
+  "version": "1.0.0",
+  "description": "source code treemap experiments",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/micahstubbs/source-code-treemap-experiments.git"
+  },
+  "author": "@micahstubbs <micah.stubbs@gmail.com> (https://twitter.com/micahstubbs)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/micahstubbs/source-code-treemap-experiments/issues"
+  },
+  "homepage": "https://github.com/micahstubbs/source-code-treemap-experiments#readme",
+  "dependencies": {
+    "csv-write-stream": "^2.0.0",
+    "d3": "^4.4.0",
+    "jsonfile": "^2.4.0",
+    "lodash": "^4.17.2"
+  }
+}
