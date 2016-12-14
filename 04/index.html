@@ -15,7 +15,7 @@ tspan:last-child {
 }
 
 </style>
-<svg width="960" height="960"></svg>
+<svg width="10000" height="10000"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
@@ -48,6 +48,7 @@ d3.csv("h2o-3.csv", function(d) {
       .sum(function(d) { return d.size; })
       .sort(function(a, b) { return b.height - a.height || b.value - a.value; });
 
+  console.log('root produced by d3.stratify()', root);
   treemap(root);
 
   var cell = svg.selectAll("a")
