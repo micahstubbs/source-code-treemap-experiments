@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link type="text/css" rel="stylesheet" href="style.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <script src="d3.layout.treemap2.js" type="text/javascript"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.19.0/babel.min.js'></script>
+    <style type="text/css">
+.chart {
+  display: block;
+  margin: auto;
+  margin-top: 40px;
+}
+
+text {
+  font-size: 11px;
+}
+
+rect {
+  fill: none;
+}
+    </style>
+  </head>
+  <body>
+    <div id="body">
+      <div id="footer">
+        d3.layout.treemap2
+        <div class="hint">click or option-click to descend or ascend</div>
+        <div><select>
+          <option value="size">Size</option>
+          <option value="count">Count</option>
+        </select></div>
+      </div>
+    </div>
+    <script src='drawTreemap.js' lang='babel' type='text/babel'></script>
+  </body>
+</html>
