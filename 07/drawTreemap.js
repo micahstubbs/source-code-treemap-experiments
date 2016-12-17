@@ -32,8 +32,8 @@ const treemap = d3.layout.treemap2()
   .round(false)
   .size([w, h])
   .sticky(true)
-  .sort((a, b) => a.value - b.value)
-  .value(d => d.size);
+  .sort((a, b) => a.data.size - b.data.size)
+  .value(d => d.data.size);
 
 const svg = d3.select('#body').append('div')
   .attr('class', 'chart')
@@ -45,11 +45,25 @@ const svg = d3.select('#body').append('div')
     .append('svg:g')
       .attr('transform', 'translate(.5,.5)');
 
-d3.json('flare.json', data => {
-  node = root = data;
+d3.csv("h2o-3.csv", function(d) {
+  d.size = +d.size;
+  return d;
+}, function(error, data) {
+  if (error) throw error;
+
+  const root = d3v4.stratify()
+    .id(function(d) { return d.path; })
+    .parentId(function(d) { return d.path.substring(0, d.path.lastIndexOf("/")); })
+    (data)
+    .sum(function(d) { return d.size; })
+    .sort(function(a, b) { return b.height - a.height || b.value - a.value; }); // sort by different property instead of value?
+
+  console.log('root produced by d3.stratify()', root);
+
+  const node = root;
 
   const nodes = treemap.nodes(root)
-    .filter(d => !d.children);
+    .filter(d => d.depth > 0 && d.depth < 3);
 
   const cell = svg.selectAll('g')
     .data(nodes)
@@ -59,8 +73,19 @@ d3.json('flare.json', data => {
       .on('click', d => zoom(node == d.parent ? root : d.parent));
 
   cell.append('svg:rect')
-    .attr('width', d => d.dx - 1)
-    .attr('height', d => d.dy - 1)
+    .attr('width', d => {
+      console.log('d from append rect', d);
+      if (d.dx >= 1) {
+        return d.dx - 1;
+      } 
+      return d.dx;
+    })
+    .attr('height', d => {
+      if (d.dy >= 1) {
+        return d.dy - 1;
+      }
+      return d.dy;
+    })
     .style('fill', d => {
       colorLinearScale.domain([0, d.maxArea]);
       return colorInterpolator(colorLinearScale(d.area));
