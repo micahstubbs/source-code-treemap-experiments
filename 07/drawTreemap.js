@@ -129,8 +129,18 @@ function zoom(d) {
     .attr('transform', d => `translate(${x(d.x)},${y(d.y)})`);
 
   t.select('rect')
-    .attr('width', d => kx * d.dx - 1)
-    .attr('height', d => ky * d.dy - 1)
+    .attr('width', d => {
+      if (d.dx >= 1) {
+        return kx * d.dx - 1;
+      }
+      return kx * d.dx;
+    })
+    .attr('height', d => {
+      if (d.dy >= 1) {
+        return ky * d.dy - 1;
+      }
+      return ky * d.dy;
+    })
 
   t.select('text')
     .attr('x', d => kx * d.dx / 2)
