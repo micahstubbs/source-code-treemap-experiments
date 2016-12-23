@@ -112,12 +112,13 @@ d3.csv("h2o-3.csv", function(d) {
   d3.select(window)
     .on('click', () => { zoom(root); });
 
-  d3.select('select').on('change', function() {
-    treemap
-      .value(this.value == 'size' ? size : count)
-      .nodes(root);
-    zoom(node);
-  });
+  d3.select('select')
+    .on('change', function() {
+      treemap
+        .value(this.value == 'size' ? size : count)
+        .nodes(root);
+      zoom(node);
+    });
 });
 
 function size(d) {
@@ -129,6 +130,7 @@ function count(d) {
 }
 
 function zoom(d) {
+  console.log('d from zoom', d);
   const kx = w / d.dx;
   const ky = h / d.dy;
   x.domain([d.x, d.x + d.dx]);
