@@ -250,17 +250,17 @@
       // ************************************************
 
       var maxDepth = d3.max(nodes.map(function(d){ return d.depth }));
-      console.log('maxDepth from d3.layout.treemap2', maxDepth);
+      // console.log('maxDepth from d3.layout.treemap2', maxDepth);
 
       // loop through all the depths, or hierarchy levels from the deepest level
       // to level 1
       for(i = maxDepth; i > 0; i--){
-        console.log('current i from d3.layout.treemap2', i);
+        // console.log('current i from d3.layout.treemap2', i);
         var parents = d3.set([]);
 
         // create an array of child nodes for the current depth
         var children = nodes.filter(function(d){ return d.depth == i })
-        console.log('children from d3.layout.treemap2', children);
+        // console.log('children from d3.layout.treemap2', children);
 
         // get a set of unique parent names for the level
         children.forEach(function(child){
@@ -275,7 +275,7 @@
         })
 
         var currentParents = parents.values();
-        console.log('currentParents from d3.layout.treemap2', currentParents);
+        // console.log('currentParents from d3.layout.treemap2', currentParents);
 
         // calculate the maxArea across all children of each parent
         // then, store that maxArea as a property on each child object
