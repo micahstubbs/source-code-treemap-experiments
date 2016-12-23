@@ -9,7 +9,9 @@ const y = d3.scale.linear().range([0, h]);
 let root;
 let node;
 let currentDepth;
+let startingDepth;
 let maxArea;
+let update;
 
 // ************************************************
 
@@ -63,73 +65,99 @@ d3.csv("h2o-3.csv", function(d) {
 
   node = root;
   currentDepth = 0;
+  startingDepth = 0;
 
-  const nodes = treemap
-    .nodes(root)
-    .filter(d => d.depth > 0 && d.depth <= 2);
+  update = (updateRoot, updateDepth) => {
+    currentDepth = updateDepth;
+    startingDepth = updateDepth;
+    const nodes = treemap
+      .nodes(updateRoot)
+      .filter(d => d.depth > updateDepth && d.depth <= updateDepth + 2);
 
-  //
-  // interesting zoom logic here
-  //
-  const cell = svg.selectAll('g')
-    .data(nodes)
-    .enter().append('svg:g')
+    const update = svg.selectAll('g')
+      .data(nodes);
+
+    const enter = update.enter()
+      .append('svg:g');
+
+    const exit = update.exit();
+
+    enter
       .attr('class', 'cell')
       .attr('transform', d => `translate(${d.x},${d.y})`)
       .on('click', d => {
+        //
+        // interesting zoom logic here
+        //
         // console.log('d.parent from click', d.parent);
         // console.log('node from click', node);
         if (currentDepth >= d.maxDepth) {
           currentDepth = 0;
           return zoom(root);
-        } else if (currentDepth < d.parent.depth) {
+        } else if (currentDepth === d.parent.depth) {
           currentDepth += 1;
-          return zoom(d.parent);
+          return zoom(d);
         }
-        currentDepth += 1;
-        return zoom(d);
+        currentDepth = d.parent.depth;
+        return zoom(d.parent);
       });
 
-  cell.append('svg:rect')
-    .attr('width', d => {
-      // console.log('d from append rect', d);
-      // console.log('d.maxArea from append rect', d.maxArea);
-      if (d.dx >= 1) {
-        return d.dx - 1;
-      } 
-      return d.dx;
-    })
-    .attr('height', d => {
-      if (d.dy >= 1) {
-        return d.dy - 1;
-      }
-      return d.dy;
-    })
-    .style('fill', d => {
-      colorLinearScale.domain([0, d.maxArea]);
-      return colorInterpolator(colorLinearScale(d.area));
-    });
+    enter
+      .append('svg:rect')
+      .attr('width', d => {
+        // console.log('d from append rect', d);
+        // console.log('d.maxArea from append rect', d.maxArea);
+        if (d.dx >= 1) {
+          return d.dx - 1;
+        } 
+        return d.dx;
+      })
+      .attr('height', d => {
+        if (d.dy >= 1) {
+          return d.dy - 1;
+        }
+        return d.dy;
+      })
+      .style('fill', d => {
+        colorLinearScale.domain([0, d.maxArea]);
+        return colorInterpolator(colorLinearScale(d.area));
+      });
 
-  cell.append('svg:text')
-    .attr('x', d => d.dx / 2)
-    .attr('y', d => d.dy / 2)
-    .attr('dy', '.35em')
-    .attr('text-anchor', 'middle')
-    .text(d => {
-      if (typeof d.name !== 'undefined') {
-        return d.name;
-      }
-      return d.id;
-    })
-    .style('opacity', function(d) {
-      d.w = this.getComputedTextLength();
-      return d.dx > d.w ? 1 : 0
-    });
+    enter
+      .append('svg:text')
+      .attr('x', d => d.dx / 2)
+      .attr('y', d => d.dy / 2)
+      .attr('dy', '.35em')
+      .attr('text-anchor', 'middle')
+      .text(d => {
+        if (typeof d.name !== 'undefined') {
+          return d.name;
+        }
+        return d.id;
+      })
+      .style('opacity', function(d) {
+        d.w = this.getComputedTextLength();
+        return d.dx > d.w ? 1 : 0
+      });
+
+    exit
+      .style('fill', 'red')
+      .remove();
+  }
+
+  // call the update function to draw our treemap
+  // the first time
+  // update(node, currentDepth);
+
+  const currentNode = node.children[2];
+  console.log('currentNode', currentNode);
+  console.log('currentNode.id', currentNode.id);
+  update(currentNode, currentNode.depth - 1);
 
   d3.select(window)
     .on('click', () => { 
-      currentDepth = 0;
-      zoom(root); 
+      update(root, 0);
+      // zoom(root); 
     });
 
   d3.select('select')
@@ -152,6 +180,11 @@ function count(d) {
 
 function zoom(d) {
   // console.log('d from zoom', d);
+
+  // if this would be the only node visible
+  // if (d.children.length === 1) {
+  //   update(d.parent, currentDepth);
+  // }
   const kx = w / d.dx;
   const ky = h / d.dy;
   x.domain([d.x, d.x + d.dx]);
@@ -181,7 +214,24 @@ function zoom(d) {
     .style('opacity', d => kx * d.dx > d.w ? 1 : 0);
 
   node = d;
-  console.log('currentDepth from zoom', currentDepth);
+  if (d !== null) {
+    if (
+      typeof d.parent !== 'undefined' &&
+      d.parent !== null
+    ) {
+    console.log('d.parent.depth from zoom', d.parent.depth);
+    } else {
+      console.log('d.depth from zoom', d.depth);
+    }
+  } else {
+    console.log('current depth from zoom', 0);
+  }
+  
   console.log('node from zoom', node);
+  if (typeof d.children !== 'undefined') {
+    console.log('# of nodes visible at current zoom level', d.children.length);
+  } else {
+    console.log('# of nodes visible at current zoom level', 1);
+  }
   d3.event.stopPropagation();
 }
