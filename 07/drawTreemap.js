@@ -62,8 +62,9 @@ d3.csv("h2o-3.csv", function(d) {
 
   const node = root;
 
-  const nodes = treemap.nodes(root)
-    .filter(d => d.depth > 0 && d.depth < 3);
+  const nodes = treemap
+    .nodes(root)
+    .filter(d => d.depth > 0 && d.depth <= 2);
 
   const cell = svg.selectAll('g')
     .data(nodes)
