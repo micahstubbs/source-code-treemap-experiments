@@ -74,7 +74,8 @@ d3.csv("h2o-3.csv", function(d) {
 
   cell.append('svg:rect')
     .attr('width', d => {
-      console.log('d from append rect', d);
+      // console.log('d from append rect', d);
+      console.log('d.maxArea from append rect', d.maxArea);
       if (d.dx >= 1) {
         return d.dx - 1;
       } 
