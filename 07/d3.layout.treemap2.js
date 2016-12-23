@@ -250,6 +250,7 @@
       // ************************************************
 
       var maxDepth = d3.max(nodes.map(function(d){ return d.depth }));
+      nodes.forEach(function(d){ d.maxDepth = maxDepth });
       // console.log('maxDepth from d3.layout.treemap2', maxDepth);
 
       // loop through all the depths, or hierarchy levels from the deepest level

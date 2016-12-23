@@ -68,16 +68,26 @@ d3.csv("h2o-3.csv", function(d) {
     .nodes(root)
     .filter(d => d.depth > 0 && d.depth <= 2);
 
+  //
+  // interesting zoom logic here
+  //
   const cell = svg.selectAll('g')
     .data(nodes)
     .enter().append('svg:g')
       .attr('class', 'cell')
       .attr('transform', d => `translate(${d.x},${d.y})`)
       .on('click', d => {
-        if (node == d.parent) {
+        // console.log('d.parent from click', d.parent);
+        // console.log('node from click', node);
+        if (currentDepth >= d.maxDepth) {
+          currentDepth = 0;
           return zoom(root);
+        } else if (currentDepth < d.parent.depth) {
+          currentDepth += 1;
+          return zoom(d.parent);
         }
-        return zoom(d.parent);
+        currentDepth += 1;
+        return zoom(d);
       });
 
   cell.append('svg:rect')
@@ -117,13 +127,17 @@ d3.csv("h2o-3.csv", function(d) {
     });
 
   d3.select(window)
-    .on('click', () => { zoom(root); });
+    .on('click', () => { 
+      currentDepth = 0;
+      zoom(root); 
+    });
 
   d3.select('select')
     .on('change', function() {
-      treemap
+      treemap 
         .value(this.value == 'size' ? size : count)
         .nodes(root);
+
       zoom(node);
     });
 });
@@ -137,8 +151,7 @@ function count(d) {
 }
 
 function zoom(d) {
-  console.log('d from zoom', d);
-  currentDepth = d.depth;
+  // console.log('d from zoom', d);
   const kx = w / d.dx;
   const ky = h / d.dy;
   x.domain([d.x, d.x + d.dx]);
