@@ -97,7 +97,12 @@ d3.csv("h2o-3.csv", function(d) {
     .attr('y', d => d.dy / 2)
     .attr('dy', '.35em')
     .attr('text-anchor', 'middle')
-    .text(d => d.name)
+    .text(d => {
+      if (typeof d.name !== 'undefined') {
+        return d.name;
+      }
+      return d.id;
+    })
     .style('opacity', function(d) {
       d.w = this.getComputedTextLength();
       return d.dx > d.w ? 1 : 0
