@@ -8,6 +8,7 @@ const x = d3.scale.linear().range([0, w]);
 const y = d3.scale.linear().range([0, h]);
 let root;
 let node;
+let currentDepth;
 let maxArea;
 
 // ************************************************
@@ -60,7 +61,8 @@ d3.csv("h2o-3.csv", function(d) {
 
   console.log('root produced by d3.stratify()', root);
 
-  const node = root;
+  node = root;
+  currentDepth = 0;
 
   const nodes = treemap
     .nodes(root)
@@ -71,7 +73,12 @@ d3.csv("h2o-3.csv", function(d) {
     .enter().append('svg:g')
       .attr('class', 'cell')
       .attr('transform', d => `translate(${d.x},${d.y})`)
-      .on('click', d => zoom(node == d.parent ? root : d.parent));
+      .on('click', d => {
+        if (node == d.parent) {
+          return zoom(root);
+        }
+        return zoom(d.parent);
+      });
 
   cell.append('svg:rect')
     .attr('width', d => {
@@ -131,6 +138,7 @@ function count(d) {
 
 function zoom(d) {
   console.log('d from zoom', d);
+  currentDepth = d.depth;
   const kx = w / d.dx;
   const ky = h / d.dy;
   x.domain([d.x, d.x + d.dx]);
@@ -160,5 +168,7 @@ function zoom(d) {
     .style('opacity', d => kx * d.dx > d.w ? 1 : 0);
 
   node = d;
+  console.log('currentDepth from zoom', currentDepth);
+  console.log('node from zoom', node);
   d3.event.stopPropagation();
 }
