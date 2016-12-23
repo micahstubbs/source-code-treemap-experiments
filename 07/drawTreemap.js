@@ -108,10 +108,13 @@ d3.csv("h2o-3.csv", function(d) {
       return d.dx > d.w ? 1 : 0
     });
 
-  d3.select(window).on('click', () => { zoom(root); });
+  d3.select(window)
+    .on('click', () => { zoom(root); });
 
   d3.select('select').on('change', function() {
-    treemap.value(this.value == 'size' ? size : count).nodes(root);
+    treemap
+      .value(this.value == 'size' ? size : count)
+      .nodes(root);
     zoom(node);
   });
 });
