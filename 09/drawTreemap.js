@@ -246,9 +246,10 @@ function main(o, data) {
   }
 
   function name(d) {
-    return d.parent
-      ? `${name(d.parent)} / ${d.key} (${formatNumber(d.value)})`
-      : `${d.key} (${formatNumber(d.value)})`;
+    if (d.parent) {
+      return `${name(d.parent)} / ${d.key} (${formatNumber(d.value)})`;
+    }
+    return `${d.key} (${formatNumber(d.value)})`;
   }
 }
 
