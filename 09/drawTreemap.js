@@ -22,7 +22,10 @@ function main(o, data) {
   const margin = opts.margin;
   const theight = 36 + 16;
 
-  $('#chart').width(opts.width).height(opts.height);
+  d3.select('#chart')
+    .attr('width', opts.width)
+    .attr('height', opts.height);
+
   const width = opts.width - margin.left - margin.right;
   const height = opts.height - margin.top - margin.bottom - theight;
   let transitioning;
