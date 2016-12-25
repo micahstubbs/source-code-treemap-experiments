@@ -1,6 +1,6 @@
 this iteration converts the code to ES2015 in something like the airbnb style
 
-for linting and lebab convenience, the javascript is abstracted out into a new file, `drawTreemap.js`
+for linting and [lebab](https://github.com/lebab/lebab) convenience, the javascript is abstracted out into a new file, `drawTreemap.js`
 
 ---
 

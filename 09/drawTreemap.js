@@ -97,10 +97,10 @@ function main(o, data) {
     root.depth = 0;
   }
 
-    // Aggregate the values for internal nodes. This is normally done by the
-    // treemap layout, but not here because of our custom implementation.
-    // We also take a snapshot of the original children (_children) to avoid
-    // the children being overwritten when when layout is computed.
+  // Aggregate the values for internal nodes. This is normally done by the
+  // treemap layout, but not here because of our custom implementation.
+  // We also take a snapshot of the original children (_children) to avoid
+  // the children being overwritten when when layout is computed.
   function accumulate(d) {
     d._children = d.values;
     if (d._children) {
@@ -110,13 +110,13 @@ function main(o, data) {
     return d.value;
   }
 
-    // Compute the treemap layout recursively such that each group of siblings
-    // uses the same size (1×1) rather than the dimensions of the parent cell.
-    // This optimizes the layout for the current zoom state. Note that a wrapper
-    // object is created for the parent node for each group of siblings so that
-    // the parent’s dimensions are not discarded as we recurse. Since each group
-    // of sibling was laid out in 1×1, we must rescale to fit using absolute
-    // coordinates. This lets us use a viewport to zoom.
+  // Compute the treemap layout recursively such that each group of siblings
+  // uses the same size (1×1) rather than the dimensions of the parent cell.
+  // This optimizes the layout for the current zoom state. Note that a wrapper
+  // object is created for the parent node for each group of siblings so that
+  // the parent’s dimensions are not discarded as we recurse. Since each group
+  // of sibling was laid out in 1×1, we must rescale to fit using absolute
+  // coordinates. This lets us use a viewport to zoom.
   function layout(d) {
     if (d._children) {
       treemap.nodes({ _children: d._children });
@@ -193,20 +193,20 @@ function main(o, data) {
       const t1 = g1.transition().duration(750);
       const t2 = g2.transition().duration(750);
 
-          // Update the domain only after entering new elements.
+      // Update the domain only after entering new elements.
       x.domain([d.x, d.x + d.dx]);
       y.domain([d.y, d.y + d.dy]);
 
-          // Enable anti-aliasing during the transition.
+      // Enable anti-aliasing during the transition.
       svg.style('shape-rendering', null);
 
-          // Draw child nodes on top of parent nodes.
+      // Draw child nodes on top of parent nodes.
       svg.selectAll('.depth').sort((a, b) => a.depth - b.depth);
 
-          // Fade-in entering text.
+      // Fade-in entering text.
       g2.selectAll('text').style('fill-opacity', 0);
 
-          // Transition to the new view.
+      // Transition to the new view.
       t1.selectAll('.ptext').call(text).style('fill-opacity', 0);
       t1.selectAll('.ctext').call(text2).style('fill-opacity', 0);
       t2.selectAll('.ptext').call(text).style('fill-opacity', 1);
@@ -214,13 +214,12 @@ function main(o, data) {
       t1.selectAll('rect').call(rect);
       t2.selectAll('rect').call(rect);
 
-          // Remove the old node when the transition is finished.
+      // Remove the old node when the transition is finished.
       t1.remove().each('end', () => {
         svg.style('shape-rendering', 'crispEdges');
         transitioning = false;
       });
     }
-
     return g;
   }
 
