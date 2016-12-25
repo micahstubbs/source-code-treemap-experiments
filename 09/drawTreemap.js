@@ -74,7 +74,13 @@ function main(o, data) {
     .attr('dy', '.75em');
 
   if (opts.title) {
-    $('#chart').prepend(`<p class='title'>${opts.title}</p>`);
+    // if the options specify a title
+    // add the title to the page before the chart div
+    const parentNode = document.querySelector('div#chart');
+    const newChild = document.createElement('div');
+    newChild.innerHTML = `<p class='title'>${opts.title}</p>`;
+    const refChild = parentNode.firstElementChild;
+    parentNode.insertBefore(newChild, refChild);
   }
   if (data instanceof Array) {
     root = { key: rname, values: data };
