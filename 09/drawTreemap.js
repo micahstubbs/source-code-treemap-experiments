@@ -30,45 +30,45 @@ function main(o, data) {
   const color = d3.scale.category20c();
 
   const x = d3.scale.linear()
-        .domain([0, width])
-        .range([0, width]);
+    .domain([0, width])
+    .range([0, width]);
 
   const y = d3.scale.linear()
-        .domain([0, height])
-        .range([0, height]);
+    .domain([0, height])
+    .range([0, height]);
 
   const treemap = d3.layout.treemap()
-        .children((d, depth) => {
-          if (depth) {
-            return null;
-          }
-          return d._children;
-        })
-        .sort((a, b) => a.value - b.value)
-        .ratio(height / (width * 0.5 * (1 + Math.sqrt(5))))
-        .round(false);
+    .children((d, depth) => {
+      if (depth) {
+        return null;
+      }
+      return d._children;
+    })
+    .sort((a, b) => a.value - b.value)
+    .ratio(height / (width * 0.5 * (1 + Math.sqrt(5))))
+    .round(false);
 
   const svg = d3.select('#chart').append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.bottom + margin.top)
-        .style('margin-left', `${-margin.left}px`)
-        .style('margin.right', `${-margin.right}px`)
-      .append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`)
-        .style('shape-rendering', 'crispEdges');
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.bottom + margin.top)
+    .style('margin-left', `${-margin.left}px`)
+    .style('margin.right', `${-margin.right}px`)
+    .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`)
+      .style('shape-rendering', 'crispEdges');
 
   const grandparent = svg.append('g')
-        .attr('class', 'grandparent');
+    .attr('class', 'grandparent');
 
   grandparent.append('rect')
-        .attr('y', -margin.top)
-        .attr('width', width)
-        .attr('height', margin.top);
+    .attr('y', -margin.top)
+    .attr('width', width)
+    .attr('height', margin.top);
 
   grandparent.append('text')
-        .attr('x', 6)
-        .attr('y', 6 - margin.top)
-        .attr('dy', '.75em');
+    .attr('x', 6)
+    .attr('y', 6 - margin.top)
+    .attr('dy', '.75em');
 
   if (opts.title) {
     $('#chart').prepend(`<p class='title'>${opts.title}</p>`);
@@ -133,54 +133,57 @@ function main(o, data) {
 
   function display(d) {
     grandparent
-          .datum(d.parent)
-          .on('click', transition)
-        .select('text')
-          .text(name(d));
+      .datum(d.parent)
+      .on('click', transition)
+      .select('text')
+        .text(name(d));
 
     const g1 = svg.insert('g', '.grandparent')
-          .datum(d)
-          .attr('class', 'depth');
+      .datum(d)
+      .attr('class', 'depth');
 
     const g = g1.selectAll('g')
-          .data(d._children)
-        .enter().append('g');
+      .data(d._children)
+      .enter().append('g');
 
     g.filter(d => d._children)
-          .classed('children', true)
-          .on('click', transition);
+      .classed('children', true)
+      .on('click', transition);
 
     const children = g.selectAll('.child')
-          .data(d => d._children || [d])
-        .enter().append('g');
+      .data(d => d._children || [d])
+      .enter().append('g');
 
     children.append('rect')
-          .attr('class', 'child')
-          .call(rect)
-        .append('title')
-          .text(d => `${d.key} (${formatNumber(d.value)})`);
+      .attr('class', 'child')
+      .call(rect)
+      .append('title')
+        .text(d => `${d.key} (${formatNumber(d.value)})`);
+
     children.append('text')
-          .attr('class', 'ctext')
-          .text(d => d.key)
-          .call(text2);
+      .attr('class', 'ctext')
+      .text(d => d.key)
+      .call(text2);
 
     g.append('rect')
-          .attr('class', 'parent')
-          .call(rect);
+      .attr('class', 'parent')
+      .call(rect);
 
     const t = g.append('text')
-          .attr('class', 'ptext')
-          .attr('dy', '.75em');
+      .attr('class', 'ptext')
+      .attr('dy', '.75em');
 
     t.append('tspan')
-          .text(d => d.key);
+      .text(d => d.key);
+
     t.append('tspan')
-          .attr('dy', '1.0em')
-          .text(d => formatNumber(d.value));
+      .attr('dy', '1.0em')
+      .text(d => formatNumber(d.value));
+
     t.call(text);
 
     g.selectAll('rect')
-          .style('fill', d => color(d.key));
+      .style('fill', d => color(d.key));
 
     function transition(d) {
       if (transitioning || !d) return;
@@ -223,29 +226,30 @@ function main(o, data) {
 
   function text(text) {
     text.selectAll('tspan')
-          .attr('x', d => x(d.x) + 6);
+      .attr('x', d => x(d.x) + 6);
+
     text.attr('x', d => x(d.x) + 6)
-          .attr('y', d => y(d.y) + 6)
-          .style('opacity', function (d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
+      .attr('y', d => y(d.y) + 6)
+      .style('opacity', function (d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
   }
 
   function text2(text) {
     text.attr('x', function (d) { return x(d.x + d.dx) - this.getComputedTextLength() - 6; })
-          .attr('y', d => y(d.y + d.dy) - 6)
-          .style('opacity', function (d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
+      .attr('y', d => y(d.y + d.dy) - 6)
+      .style('opacity', function (d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
   }
 
   function rect(rect) {
     rect.attr('x', d => x(d.x))
-          .attr('y', d => y(d.y))
-          .attr('width', d => x(d.x + d.dx) - x(d.x))
-          .attr('height', d => y(d.y + d.dy) - y(d.y));
+      .attr('y', d => y(d.y))
+      .attr('width', d => x(d.x + d.dx) - x(d.x))
+      .attr('height', d => y(d.y + d.dy) - y(d.y));
   }
 
   function name(d) {
     return d.parent
-          ? `${name(d.parent)} / ${d.key} (${formatNumber(d.value)})`
-          : `${d.key} (${formatNumber(d.value)})`;
+      ? `${name(d.parent)} / ${d.key} (${formatNumber(d.value)})`
+      : `${d.key} (${formatNumber(d.value)})`;
   }
 }
 
