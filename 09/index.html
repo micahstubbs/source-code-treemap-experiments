@@ -11,54 +11,46 @@ Generic treemap, based on http://bost.ocks.org/mike/treemap/
   background: #fff;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
-
 .title {
     font-weight: bold;
     font-size: 24px;
     text-align: center;
     margin-top: 6px;
     margin-bottom: 6px;
+    position: relative;
+    width: 960px;
 }
 text {
   pointer-events: none;
 }
-
 .grandparent text {
   font-weight: bold;
 }
-
 rect {
   fill: none;
   stroke: #fff;
 }
-
 rect.parent,
 .grandparent rect {
   stroke-width: 2px;
 }
-
 rect.parent {
     pointer-events: none;
 }
-
 .grandparent rect {
   fill: orange;
 }
-
 .grandparent:hover rect {
   fill: #ee9700;
 }
-
 .children rect.parent,
 .grandparent rect {
   cursor: pointer;
 }
-
 .children rect.parent {
   fill: #bbb;
   fill-opacity: .5;
 }
-
 .children:hover rect.child {
   fill: #bbb;
 }
