@@ -1,5 +1,7 @@
 this iteration converts the code to ES2015 in something like the airbnb style
 
+still d3 version 3
+
 for linting and [lebab](https://github.com/lebab/lebab) convenience, the javascript is abstracted out into a new file, `drawTreemap.js`
 
 ---
