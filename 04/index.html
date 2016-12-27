@@ -15,7 +15,7 @@ tspan:last-child {
 }
 
 </style>
-<svg width="20000" height="20000"></svg>
+<svg width="960" height="960"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
@@ -52,7 +52,7 @@ d3.csv("h2o-3.csv", function(d) {
   treemap(root);
 
   var cell = svg.selectAll("a")
-    .data(root.leaves())
+    .data(root.descendants())
     .enter().append("a")
       .attr("target", "_blank")
       .attr("xlink:href", function(d) { var p = d.data.path.split("/"); return "https://github.com/" + githubUsername + "/" + repoName + "/blob/" + "master" + "/" + p.slice(1).join("/"); })
@@ -62,7 +62,14 @@ d3.csv("h2o-3.csv", function(d) {
       .attr("id", function(d) { return d.id; })
       .attr("width", function(d) { return d.x1 - d.x0; })
       .attr("height", function(d) { return d.y1 - d.y0; })
-      .attr("fill", function(d) { var a = d.ancestors(); return color(a[a.length - 2].id); });
+      .attr("fill", function(d) { 
+        var a = d.ancestors();
+        // console.log('a', a);
+        if (a.length < 2) {
+          return color(a[a.length - 1].id);
+        }
+        return color(a[a.length - 2].id);
+      });
 
   cell.append("clipPath")
       .attr("id", function(d) { return "clip-" + d.id; })
