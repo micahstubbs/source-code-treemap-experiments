@@ -15,7 +15,6 @@ const defaults = {
 };
 
 function main(o, data) {
-  let root;
   const opts = deepExtend({}, defaults, o);
   const formatNumber = d3.format(opts.format);
   const rname = opts.rootname;
@@ -40,16 +39,23 @@ function main(o, data) {
     .domain([0, height])
     .range([0, height]);
 
-  const treemap = d3.layout.treemap()
-    .children((d, depth) => {
-      if (depth) {
-        return null;
-      }
-      return d._children;
-    })
-    .sort((a, b) => a.value - b.value)
-    .ratio(height / (width * 0.5 * (1 + Math.sqrt(5))))
-    .round(false);
+  const treemap = d3.treemap()
+    .size([width, height])
+    .padding(false)
+    .padding(1);
+
+  console.log('treemap()', treemap());
+
+  // const hierarchy = d3.hierarchy()
+  //   .children((d, depth) => {
+  //     if (depth) {
+  //       return null;
+  //     }
+  //     return d._children;
+  //   })
+  //   .sort((a, b) => a.value - b.value)
+  //   .ratio(height / (width * 0.5 * (1 + Math.sqrt(5))))
+  //   .round(false);
 
   const svg = d3.select('#chart').append('svg')
     .attr('width', width + margin.left + margin.right)
@@ -82,6 +88,8 @@ function main(o, data) {
     const refChild = parentNode.firstElementChild;
     parentNode.insertBefore(newChild, refChild);
   }
+
+  let root;
   if (data instanceof Array) {
     root = { key: rname, values: data };
   } else {
@@ -104,7 +112,7 @@ function main(o, data) {
     root.dx = width;
     root.dy = height;
     root.depth = 0;
-  }
+  } 
 
   // Aggregate the values for internal nodes. This is normally done by the
   // treemap layout, but not here because of our custom implementation.

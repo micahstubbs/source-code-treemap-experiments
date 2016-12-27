@@ -22,6 +22,7 @@ function main(o, data) {
   const margin = opts.margin;
   const theight = 36 + 16;
 
+  // set size of chart div
   d3.select('#chart')
     .attr('width', opts.width)
     .attr('height', opts.height);
@@ -30,6 +31,9 @@ function main(o, data) {
   const height = opts.height - margin.top - margin.bottom - theight;
   let transitioning;
 
+  //
+  // setup scales
+  //
   const color = d3.scale.category20c();
 
   const x = d3.scale.linear()
@@ -51,6 +55,11 @@ function main(o, data) {
     .ratio(height / (width * 0.5 * (1 + Math.sqrt(5))))
     .round(false);
 
+  //
+  // setup the page
+  //
+
+  // add svg to the page
   const svg = d3.select('#chart').append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.bottom + margin.top)
@@ -60,6 +69,7 @@ function main(o, data) {
       .attr('transform', `translate(${margin.left},${margin.top})`)
       .style('shape-rendering', 'crispEdges');
 
+  // add grandparent svg group
   const grandparent = svg.append('g')
     .attr('class', 'grandparent');
 
@@ -73,8 +83,8 @@ function main(o, data) {
     .attr('y', 6 - margin.top)
     .attr('dy', '.75em');
 
+  // if the options specify a title
   if (opts.title) {
-    // if the options specify a title
     // add the title to the page before the chart div
     const parentNode = document.querySelector('div#chart');
     const newChild = document.createElement('div');
@@ -82,16 +92,29 @@ function main(o, data) {
     const refChild = parentNode.firstElementChild;
     parentNode.insertBefore(newChild, refChild);
   }
+
+  //
+  // construct the tree data
+  //
+
+  // build the root node from the data
+  // support both
+  // an array of objects
+  // and
+  // a nested json object
   if (data instanceof Array) {
     root = { key: rname, values: data };
   } else {
     root = data;
   }
 
+  // call functions 
+  // to add properties to
+  // the root object
   initialize(root);
   accumulate(root);
   layout(root);
-  console.log(root);
+  console.log('root', root);
   display(root);
 
   if (window.parent !== window) {
@@ -99,6 +122,7 @@ function main(o, data) {
     window.parent.postMessage({ height: myheight }, '*');
   }
 
+  // add position values to the root node
   function initialize(root) {
     root.x = root.y = 0;
     root.dx = width;

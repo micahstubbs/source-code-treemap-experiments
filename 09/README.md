@@ -1,8 +1,16 @@
-this iteration converts the code to ES2015 in something like the airbnb style
+this iteration converts the code to [ES2015](https://babeljs.io/learn-es2015/) in something like the [airbnb style](https://github.com/airbnb/javascript)  
 
-still d3 version 3
+still [d3 version 3](https://github.com/d3/d3-3.x-api-reference/blob/master/API-Reference.md)  
 
-for linting and [lebab](https://github.com/lebab/lebab) convenience, the javascript is abstracted out into a new file, `drawTreemap.js`
+for linting and [lebab](https://github.com/lebab/lebab) convenience, the javascript is abstracted out into a new file, `drawTreemap.js`  
+
+would really like to see block converted to [d3 version 4](https://github.com/d3/d3/blob/master/API.md)  
+
+read the [Hierarchies section of CHANGES.md](https://github.com/d3/d3/blob/master/CHANGES.md#hierarchies-d3-hierarchy), but haven't quite figured out exactly how to use the v4 treemap layout with the custom layout functions in this block 😅🤔  
+
+do tweet [@micahstubbs](https://twitter.com/micahstubbs) if you figure it out 😀  
+
+a fork of [Zoomable Treemap Template](http://bl.ocks.org/ganeshv/6a8e9ada3ab7f2d88022) from [ganeshv](http://bl.ocks.org/ganeshv)
 
 ---
 
@@ -76,3 +84,4 @@ Examples (to be run in [pigshell](http://pigshell.com)):
 
     load http://d3js.org/d3.v3.min.js
     cat /usr/share/misc/countries.json | to text | jf 'JSON.parse(x)'| rename -f "name,population" -t "key,value" | jf -g 'd3.nest().key(function(d) {return d.region;}).key(function(d) { return d.subregion; }).entries(x)' | iframe -o title="World Population",rootname="World" -g 'http://bl.ocks.org/ganeshv/raw/6a8e9ada3ab7f2d88022/#wait'
+
