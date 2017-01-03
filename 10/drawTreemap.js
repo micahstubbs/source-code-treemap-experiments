@@ -116,9 +116,10 @@ function main(o, data) {
   }
 
   function initialize(root) {
-    root.x = root.y = 0;
-    root.dx = width;
-    root.dy = height;
+    root.x0 = 0;
+    root.y0 = 0;
+    root.x1 = width;
+    root.y1 = height;
     root.depth = 0;
   } 
 
@@ -144,29 +145,21 @@ function main(o, data) {
   // coordinates. This lets us use a viewport to zoom.
   function layout(d) {
     console.log('d from layout', d);
-    if (d._children) {
-      treemap({ _children: d._children });
-      d._children.forEach((c) => {
-        c.x = d.x + (c.x * d.dx);
-        c.y = d.y + (c.y * d.dy);
-        c.dx *= d.dx;
-        c.dy *= d.dy;
-        c.parent = d;
-        layout(c);
-      });
-    }
     if (d.children) {
       let childrenRoot = d3.hierarchy({ children: d.children }, d => d.children)
         .sum(d => d.value)
         .sort((a, b) => b.value - a.value);
 
       treemap(childrenRoot);
-      console.log('childrenRoot from layout', childrenRoot)
+
+      d.children = childrenRoot.children;
+      // console.log('childrenRoot from layout', childrenRoot)
       d.children.forEach((c) => {
-        c.x = d.x + (c.x * d.dx);
-        c.y = d.y + (c.y * d.dy);
-        c.dx *= d.dx;
-        c.dy *= d.dy;
+        console.log('c from layout', c);
+        c.x0 = d.x0 + (c.x0 * d.x1);
+        c.y0 = d.y0 + (c.y0 * d.y1);
+        c.x1 *= d.x1;
+        c.y1 *= d.y1;
         c.parent = d;
         layout(c);
       });
@@ -185,15 +178,15 @@ function main(o, data) {
       .attr('class', 'depth');
 
     const g = g1.selectAll('g')
-      .data(d._children)
+      .data(d.children)
       .enter().append('g');
 
-    g.filter(d => d._children)
+    g.filter(d => d.children)
       .classed('children', true)
       .on('click', transition);
 
     const children = g.selectAll('.child')
-      .data(d => d._children || [d])
+      .data(d => d.children || [d])
       .enter().append('g');
 
     children.append('rect')
@@ -236,8 +229,8 @@ function main(o, data) {
       const t2 = g2.transition().duration(750);
 
       // Update the domain only after entering new elements.
-      x.domain([d.x, d.x + d.dx]);
-      y.domain([d.y, d.y + d.dy]);
+      x.domain([d.x0, d.x0 + d.x1]);
+      y.domain([d.y0, d.y0 + d.y1]);
 
       // Enable anti-aliasing during the transition.
       svg.style('shape-rendering', null);
@@ -267,24 +260,30 @@ function main(o, data) {
 
   function text(text) {
     text.selectAll('tspan')
-      .attr('x', d => x(d.x) + 6);
+      .attr('x', d => x(d.x0) + 6);
 
-    text.attr('x', d => x(d.x) + 6)
-      .attr('y', d => y(d.y) + 6)
-      .style('opacity', function (d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
+    text.attr('x', d => x(d.x0) + 6)
+      .attr('y', d => y(d.y0) + 6)
+      .style('opacity', function (d) { return this.getComputedTextLength() < x(d.x0 + d.x1) - x(d.x0) ? 1 : 0; });
   }
 
   function text2(text) {
-    text.attr('x', function (d) { return x(d.x + d.dx) - this.getComputedTextLength() - 6; })
-      .attr('y', d => y(d.y + d.dy) - 6)
-      .style('opacity', function (d) { return this.getComputedTextLength() < x(d.x + d.dx) - x(d.x) ? 1 : 0; });
+    text.attr('x', function (d) { 
+      return x(d.x0 + d.x1) - this.getComputedTextLength() - 6; 
+    })
+      .attr('y', d => y(d.y0 + d.y1) - 6)
+      .style('opacity', function (d) { return this.getComputedTextLength() < x(d.x0 + d.x1) - x(d.x0) ? 1 : 0; });
   }
 
   function rect(rect) {
-    rect.attr('x', d => x(d.x))
-      .attr('y', d => y(d.y))
-      .attr('width', d => x(d.x + d.dx) - x(d.x))
-      .attr('height', d => y(d.y + d.dy) - y(d.y));
+    rect.attr('x', d => {
+      // console.log('d from rect', d);
+      // console.log('d.x from rect', d.x);
+      return x(d.x0)
+    })
+      .attr('y', d => y(d.y0))
+      .attr('width', d => x(d.x0 + d.x1) - x(d.x0))
+      .attr('height', d => y(d.y0 + d.y1) - y(d.y0));
   }
 
   function name(d) {

@@ -152,8 +152,10 @@ function main(o, data) {
   // coordinates. This lets us use a viewport to zoom.
   function layout(d) {
     if (d._children) {
+      console.log('d from layout', d);
       treemap.nodes({ _children: d._children });
       d._children.forEach((c) => {
+        console.log('c from layout', c);
         c.x = d.x + (c.x * d.dx);
         c.y = d.y + (c.y * d.dy);
         c.dx *= d.dx;
