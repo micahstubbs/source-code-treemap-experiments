@@ -39,12 +39,19 @@ function main(o, data) {
     .domain([0, height])
     .range([0, height]);
 
+  const nest = d3.nest()
+    .key(d => '')   // root
+    .key(d => d.region)
+    .key(d => d.subregion)
+    .key(d => d.key)
+    .sortValues((a, b) => b.value - a.value);
+
   const treemap = d3.treemap()
     .size([width, height])
     .padding(false)
     .padding(1);
 
-  console.log('treemap()', treemap());
+  // console.log('treemap()', treemap());
 
   // const hierarchy = d3.hierarchy()
   //   .children((d, depth) => {
@@ -89,12 +96,13 @@ function main(o, data) {
     parentNode.insertBefore(newChild, refChild);
   }
 
-  let root;
-  if (data instanceof Array) {
-    root = { key: rname, values: data };
-  } else {
-    root = data;
-  }
+  console.log('data right before root', data);
+
+  let root = d3.hierarchy(data, d => d.values)
+    .sum(d => d.value)
+    .sort((a, b) => b.value - a.value);
+
+  console.log('root', root);
 
   initialize(root);
   accumulate(root);
@@ -135,9 +143,26 @@ function main(o, data) {
   // of sibling was laid out in 1×1, we must rescale to fit using absolute
   // coordinates. This lets us use a viewport to zoom.
   function layout(d) {
+    console.log('d from layout', d);
     if (d._children) {
-      treemap.nodes({ _children: d._children });
+      treemap({ _children: d._children });
       d._children.forEach((c) => {
+        c.x = d.x + (c.x * d.dx);
+        c.y = d.y + (c.y * d.dy);
+        c.dx *= d.dx;
+        c.dy *= d.dy;
+        c.parent = d;
+        layout(c);
+      });
+    }
+    if (d.children) {
+      let childrenRoot = d3.hierarchy({ children: d.children }, d => d.children)
+        .sum(d => d.value)
+        .sort((a, b) => b.value - a.value);
+
+      treemap(childrenRoot);
+      console.log('childrenRoot from layout', childrenRoot)
+      d.children.forEach((c) => {
         c.x = d.x + (c.x * d.dx);
         c.y = d.y + (c.y * d.dy);
         c.dx *= d.dx;
@@ -291,10 +316,10 @@ function main(o, data) {
 }
 
 if (window.location.hash === '') {
-  d3.json('countries.json', (err, res) => {
+  d3.json('countries.json', (err, response) => {
     if (!err) {
-      console.log(res);
-      const data = d3.nest().key(d => d.region).key(d => d.subregion).entries(res);
+      console.log('response', response);
+      const data = d3.nest().key(d => d.region).key(d => d.subregion).entries(response);
       main({ title: 'World Population' }, { key: 'World', values: data });
     }
   });
