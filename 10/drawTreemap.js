@@ -31,12 +31,10 @@ function main(o, data) {
 
   const color = d3.scaleOrdinal(d3.schemeCategory20c);
 
-  const x = d3.scaleLinear()
-    .domain([0, width])
+  let x = d3.scaleLinear()
     .range([0, width]);
 
-  const y = d3.scaleLinear()
-    .domain([0, height])
+  let y = d3.scaleLinear()
     .range([0, height]);
 
   const nest = d3.nest()
@@ -102,6 +100,12 @@ function main(o, data) {
     .sum(d => d.value)
     .sort((a, b) => b.value - a.value);
 
+  // x.domain([0, root.value]);
+  // y.domain([0, root.value]);
+
+  x.domain([0, root.value]);
+  y.domain([0, root.value]);
+
   console.log('root', root);
 
   initialize(root);
@@ -128,9 +132,10 @@ function main(o, data) {
   // We also take a snapshot of the original children (_children) to avoid
   // the children being overwritten when when layout is computed.
   function accumulate(d) {
-    d._children = d.values;
+    console.log('d from accumulate', d);
+    d._children = d.children;
     if (d._children) {
-      d.value = d.values.reduce((p, v) => p + accumulate(v), 0);
+      d.value = d.children.reduce((p, v) => p + accumulate(v), 0);
       return d.value;
     }
     return d.value;
@@ -144,18 +149,18 @@ function main(o, data) {
   // of sibling was laid out in 1×1, we must rescale to fit using absolute
   // coordinates. This lets us use a viewport to zoom.
   function layout(d) {
-    console.log('d from layout', d);
-    if (d.children) {
-      let childrenRoot = d3.hierarchy({ children: d.children }, d => d.children)
+    // console.log('d from layout', d);
+    if (d._children) {
+      let childrenRoot = d3.hierarchy({ _children: d._children }, d => d._children)
         .sum(d => d.value)
         .sort((a, b) => b.value - a.value);
 
       treemap(childrenRoot);
 
-      d.children = childrenRoot.children;
+      d._children = childrenRoot.children;
       // console.log('childrenRoot from layout', childrenRoot)
-      d.children.forEach((c) => {
-        console.log('c from layout', c);
+      d._children.forEach((c) => {
+        // console.log('c from layout', c);
         c.x0 = d.x0 + (c.x0 * d.x1);
         c.y0 = d.y0 + (c.y0 * d.y1);
         c.x1 *= d.x1;
@@ -178,15 +183,15 @@ function main(o, data) {
       .attr('class', 'depth');
 
     const g = g1.selectAll('g')
-      .data(d.children)
+      .data(d._children)
       .enter().append('g');
 
-    g.filter(d => d.children)
+    g.filter(d => d._children)
       .classed('children', true)
       .on('click', transition);
 
     const children = g.selectAll('.child')
-      .data(d => d.children || [d])
+      .data(d => d._children || [d])
       .enter().append('g');
 
     children.append('rect')
@@ -277,8 +282,8 @@ function main(o, data) {
 
   function rect(rect) {
     rect.attr('x', d => {
-      // console.log('d from rect', d);
-      // console.log('d.x from rect', d.x);
+      console.log('d from rect', d);
+      console.log('d.x0 from rect', d.x0);
       return x(d.x0)
     })
       .attr('y', d => y(d.y0))
