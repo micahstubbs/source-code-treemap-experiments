@@ -286,11 +286,13 @@ function main(o, data) {
       .attr('height', d => y(d.y0 + d.y1) - y(d.y0));
   }
 
+  // used for navigation bar at the top
   function name(d) {
     if (d.parent) {
-      return `${name(d.parent)} / ${d.key} (${formatNumber(d.value)})`;
+      return `${name(d.parent)} / ${d.data.key} (${formatNumber(d.value)})`;
     }
-    return `${d.key} (${formatNumber(d.value)})`;
+    // used for navigation bar at the top
+    return `${d.data.key} (${formatNumber(d.value)})`;
   }
 
   // a replacement for the jQuery `$.extend(true, {}, objA, objB);`
